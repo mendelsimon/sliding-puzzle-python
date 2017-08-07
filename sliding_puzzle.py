@@ -1,8 +1,9 @@
 import pygame
 import sys
+import random
 from pygame.locals import *
 
-FPS = 30
+FPS = 15
 BOARD_HEIGHT = 4
 BOARD_WIDTH = 4
 BOARD = [[cell + (row * BOARD_WIDTH) for cell in range(1, BOARD_WIDTH + 1)] for row in range(BOARD_HEIGHT)]
@@ -14,7 +15,12 @@ MARGIN_SIZE = 20
 INFO_SIZE = 0
 WINDOW_WIDTH = (BOX_SIZE * BOARD_WIDTH) + ((GAP_SIZE * BOARD_WIDTH) - GAP_SIZE) + (MARGIN_SIZE * 2)
 WINDOW_HEIGHT = WINDOW_WIDTH + INFO_SIZE
+
 FONT_SIZE = 32
+ANIMATE_SPEED = 20
+
+ROW_INDEX = 0
+CELL_INDEX = 1
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -54,7 +60,7 @@ def play_game():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == KEYUP:
+            elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
@@ -78,9 +84,18 @@ def draw_board():
     for row in range(len(BOARD)):
         for cell in range(len(BOARD[row])):
             if BOARD[row][cell] > 0:
-                x = MARGIN_SIZE + (BOX_SIZE * cell) + (GAP_SIZE * cell)
-                y = MARGIN_SIZE + INFO_SIZE + (BOX_SIZE * row) + (GAP_SIZE * row)
+                x, y = get_box_position((row, cell))
                 draw_box((x, y, BOX_SIZE, BOX_SIZE), BOARD[row][cell])
+
+
+def get_box_position(box):
+    """Returns the x and y coordinates of the specified box"""
+    row = box[ROW_INDEX]
+    cell = box[CELL_INDEX]
+
+    x = MARGIN_SIZE + (BOX_SIZE * cell) + (GAP_SIZE * cell)
+    y = MARGIN_SIZE + INFO_SIZE + (BOX_SIZE * row) + (GAP_SIZE * row)
+    return x, y
 
 
 def draw_box(rect, num):
@@ -96,8 +111,6 @@ def draw_box(rect, num):
 
 def move(direction):
     """Moves the appropriate box in the specified direction, if possible."""
-    ROW_INDEX = 0
-    CELL_INDEX = 1
     TOP = 0
     BOTTOM = BOARD_HEIGHT - 1
     LEFTMOST = 0
@@ -110,22 +123,22 @@ def move(direction):
     if direction == UP and row != BOTTOM:
         value = BOARD[row + 1][cell]
         BOARD[row + 1][cell] = 0
-        animate((row + 1, cell), direction)
+        animate((row + 1, cell), blank, value)
         BOARD[row][cell] = value
     elif direction == DOWN and row != TOP:
         value = BOARD[row - 1][cell]
         BOARD[row - 1][cell] = 0
-        animate((row - 1, cell), direction)
+        animate((row - 1, cell), blank, value)
         BOARD[row][cell] = value
     elif direction == LEFT and cell != RIGHTMOST:
         value = BOARD[row][cell + 1]
         BOARD[row][cell + 1] = 0
-        animate((row, cell + 1), direction)
+        animate((row, cell + 1), blank, value)
         BOARD[row][cell] = value
     elif direction == RIGHT and cell != LEFTMOST:
         value = BOARD[row][cell - 1]
         BOARD[row][cell - 1] = 0
-        animate((row, cell - 1), direction)
+        animate((row, cell - 1), blank, value)
         BOARD[row][cell] = value
 
 
@@ -138,15 +151,39 @@ def find_blank():
     raise Exception("Was not able to find the blank cell")
 
 
-def animate(box, direction):
+def animate(start_box, end_box, num):
     """Animates the specified box moving in the specified direction"""
-    # TODO implement animation.
-    return
+    x, y = get_box_position(start_box)
+    end_x, end_y = get_box_position(end_box)
+    delta_x, delta_y = end_x - x, end_y - y
+    if delta_x + delta_y > 0:
+        x_step = y_step = ANIMATE_SPEED
+    else:
+        x_step = y_step = -ANIMATE_SPEED
+
+    if delta_x != 0:
+        for new_x in range(x, end_x, x_step):
+            draw_board()
+            draw_box((new_x, y, BOX_SIZE, BOX_SIZE), num)
+            pygame.display.update()
+    elif delta_y != 0:
+        for new_y in range(y, end_y, y_step):
+            draw_board()
+            draw_box((x, new_y, BOX_SIZE, BOX_SIZE), num)
+            pygame.display.update()
+    else:
+        raise Exception("Nothing to animate")
 
 
 def play_win_screen():
     """Displays a message informing the player that they won"""
     # TODO implement win screen
+
+
+def shuffle():
+    """Shuffles the board"""
+    # TODO implement shuffle
+    return
 
 
 main()
