@@ -76,8 +76,6 @@ def play_game():
                 elif event.key == K_s:
                     shuffle()
 
-        draw_board()
-        pygame.display.update()
         FPSCLOCK.tick(FPS)
 
 
@@ -144,6 +142,9 @@ def move(direction):
         animate((row, cell - 1), blank, value)
         BOARD[row][cell] = value
 
+    draw_board()
+    pygame.display.update()
+
 
 def find_blank():
     """Finds the 0 on the board. Returns a tuple: (row, cell)"""
@@ -184,11 +185,44 @@ def play_win_screen():
 
 
 def shuffle():
-    """Shuffles the board"""
-    # TODO implement smarter shuffle
-    directions = [UP, DOWN, LEFT, RIGHT]
-    for i in range(SHUFFLE_MOVES):
-        move(random.choice(directions))
+    """Shuffles the board intelligently. Does not make invalid moves, or undo last move"""
+    TOP = 0
+    BOTTOM = BOARD_HEIGHT - 1
+    LEFTMOST = 0
+    RIGHTMOST = BOARD_WIDTH - 1
+    blank_row, blank_cell = find_blank()
+
+    moves = []
+    for i in range(0, SHUFFLE_MOVES):
+        previous_move = ""
+        if i > 0:
+            previous_move = moves[i-1]
+        choices = []
+        if blank_row != TOP and previous_move != UP:
+            choices.append(DOWN)
+        if blank_row != BOTTOM and previous_move != DOWN:
+            choices.append(UP)
+        if blank_cell != LEFTMOST and previous_move != LEFT:
+            choices.append(RIGHT)
+        if blank_cell != RIGHTMOST and previous_move != RIGHT:
+            choices.append(LEFT)
+
+        moves.append(random.choice(choices))
+
+        if moves[i] == UP:
+            blank_row += 1
+        elif moves[i] == DOWN:
+            blank_row -= 1
+        elif moves[i] == LEFT:
+            blank_cell += 1
+        elif moves[i] == RIGHT:
+            blank_cell -= 1
+
+    for direction in moves:
+        if len(pygame.event.get(QUIT)) > 0 or pygame.key.get_pressed()[K_ESCAPE]:
+            pygame.quit()
+            sys.exit()
+        move(direction)
 
 
 main()
