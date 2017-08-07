@@ -26,6 +26,11 @@ BOX_COLOR = GREEN
 FONT_COLOR = BLACK
 BG_COLOR = BLUE
 
+LEFT = 'left'
+RIGHT = 'right'
+UP = 'up'
+DOWN = 'down'
+
 
 def main():
     global DISPLAY_SURFACE, FPSCLOCK
@@ -53,21 +58,33 @@ def play_game():
                 if event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
+                elif event.key == K_UP:
+                    move(UP)
+                elif event.key == K_DOWN:
+                    move(DOWN)
+                elif event.key == K_LEFT:
+                    move(LEFT)
+                elif event.key == K_RIGHT:
+                    move(RIGHT)
 
+        draw_board()
+        pygame.display.update()
         FPSCLOCK.tick(FPS)
 
 
 def draw_board():
+    """Draws the game board"""
     DISPLAY_SURFACE.fill(BG_COLOR)
     for row in range(len(BOARD)):
         for cell in range(len(BOARD[row])):
-            if BOARD[row][cell] != 0:
+            if BOARD[row][cell] > 0:
                 x = MARGIN_SIZE + (BOX_SIZE * cell) + (GAP_SIZE * cell)
                 y = MARGIN_SIZE + INFO_SIZE + (BOX_SIZE * row) + (GAP_SIZE * row)
                 draw_box((x, y, BOX_SIZE, BOX_SIZE), BOARD[row][cell])
 
 
 def draw_box(rect, num):
+    """Draws the rect, with the num in middle"""
     font = pygame.font.Font("freesansbold.ttf", FONT_SIZE)
     label = font.render(str(num), True, FONT_COLOR)
     label_rect = label.get_rect()
@@ -75,6 +92,61 @@ def draw_box(rect, num):
     label_rect.center = box.center
     pygame.draw.rect(DISPLAY_SURFACE, BOX_COLOR, box)
     DISPLAY_SURFACE.blit(label, label_rect)
+
+
+def move(direction):
+    """Moves the appropriate box in the specified direction, if possible."""
+    ROW_INDEX = 0
+    CELL_INDEX = 1
+    TOP = 0
+    BOTTOM = BOARD_HEIGHT - 1
+    LEFTMOST = 0
+    RIGHTMOST = BOARD_WIDTH - 1
+
+    blank = find_blank()
+    row = blank[ROW_INDEX]
+    cell = blank[CELL_INDEX]
+
+    if direction == UP and row != BOTTOM:
+        value = BOARD[row + 1][cell]
+        BOARD[row + 1][cell] = 0
+        animate((row + 1, cell), direction)
+        BOARD[row][cell] = value
+    elif direction == DOWN and row != TOP:
+        value = BOARD[row - 1][cell]
+        BOARD[row - 1][cell] = 0
+        animate((row - 1, cell), direction)
+        BOARD[row][cell] = value
+    elif direction == LEFT and cell != RIGHTMOST:
+        value = BOARD[row][cell + 1]
+        BOARD[row][cell + 1] = 0
+        animate((row, cell + 1), direction)
+        BOARD[row][cell] = value
+    elif direction == RIGHT and cell != LEFTMOST:
+        value = BOARD[row][cell - 1]
+        BOARD[row][cell - 1] = 0
+        animate((row, cell - 1), direction)
+        BOARD[row][cell] = value
+
+
+def find_blank():
+    """Finds the 0 on the board. Returns a tuple: (row, cell)"""
+    for row in range(len(BOARD)):
+        for cell in range(len(BOARD[row])):
+            if BOARD[row][cell] == 0:
+                return (row, cell)
+    raise Exception("Was not able to find the blank cell")
+
+
+def animate(box, direction):
+    """Animates the specified box moving in the specified direction"""
+    # TODO implement animation.
+    return
+
+
+def play_win_screen():
+    """Displays a message informing the player that they won"""
+    # TODO implement win screen
 
 
 main()
