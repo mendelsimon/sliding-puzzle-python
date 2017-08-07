@@ -16,6 +16,7 @@ INFO_SIZE = 0
 WINDOW_WIDTH = (BOX_SIZE * BOARD_WIDTH) + ((GAP_SIZE * BOARD_WIDTH) - GAP_SIZE) + (MARGIN_SIZE * 2)
 WINDOW_HEIGHT = WINDOW_WIDTH + INFO_SIZE
 
+SHUFFLE_MOVES = 50
 FONT_SIZE = 32
 ANIMATE_SPEED = 20
 
@@ -72,6 +73,8 @@ def play_game():
                     move(LEFT)
                 elif event.key == K_RIGHT:
                     move(RIGHT)
+                elif event.key == K_s:
+                    shuffle()
 
         draw_board()
         pygame.display.update()
@@ -182,8 +185,10 @@ def play_win_screen():
 
 def shuffle():
     """Shuffles the board"""
-    # TODO implement shuffle
-    return
+    # TODO implement smarter shuffle
+    directions = [UP, DOWN, LEFT, RIGHT]
+    for i in range(SHUFFLE_MOVES):
+        move(random.choice(directions))
 
 
 main()
