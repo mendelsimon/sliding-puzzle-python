@@ -8,6 +8,7 @@ BOARD_HEIGHT = 4
 BOARD_WIDTH = 4
 BOARD = [[cell + (row * BOARD_WIDTH) for cell in range(1, BOARD_WIDTH + 1)] for row in range(BOARD_HEIGHT)]
 BOARD[BOARD_HEIGHT - 1][BOARD_WIDTH - 1] = 0
+ORIGINAL_BOARD = [row[:] for row in BOARD]
 
 BOX_SIZE = 100
 GAP_SIZE = 5
@@ -80,6 +81,8 @@ def play_game():
                     shuffle()
                 elif event.key == K_z:
                     undo()
+                elif event.key == K_r:
+                    reset()
 
         FPSCLOCK.tick(FPS)
 
@@ -248,6 +251,16 @@ def undo():
             move(LEFT)
 
         del MOVES[len(MOVES) - 1]  # Delete the move we just added
+
+
+def reset():
+    global BOARD, MOVES
+    print(BOARD)
+    print(ORIGINAL_BOARD)
+    BOARD = [row[:] for row in ORIGINAL_BOARD]
+    MOVES = []
+    draw_board()
+    pygame.display.update()
 
 
 main()
