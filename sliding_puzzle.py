@@ -38,6 +38,8 @@ RIGHT = 'right'
 UP = 'up'
 DOWN = 'down'
 
+MOVES = []
+
 
 def main():
     global DISPLAY_SURFACE, FPSCLOCK, FONT
@@ -76,6 +78,8 @@ def play_game():
                     move(RIGHT)
                 elif event.key == K_s:
                     shuffle()
+                elif event.key == K_z:
+                    undo()
 
         FPSCLOCK.tick(FPS)
 
@@ -126,21 +130,25 @@ def move(direction):
         BOARD[row + 1][cell] = 0
         animate((row + 1, cell), blank, value)
         BOARD[row][cell] = value
+        MOVES.append(UP)
     elif direction == DOWN and row != TOP:
         value = BOARD[row - 1][cell]
         BOARD[row - 1][cell] = 0
         animate((row - 1, cell), blank, value)
         BOARD[row][cell] = value
+        MOVES.append(DOWN)
     elif direction == LEFT and cell != RIGHTMOST:
         value = BOARD[row][cell + 1]
         BOARD[row][cell + 1] = 0
         animate((row, cell + 1), blank, value)
         BOARD[row][cell] = value
+        MOVES.append(LEFT)
     elif direction == RIGHT and cell != LEFTMOST:
         value = BOARD[row][cell - 1]
         BOARD[row][cell - 1] = 0
         animate((row, cell - 1), blank, value)
         BOARD[row][cell] = value
+        MOVES.append(RIGHT)
 
     draw_board()
     pygame.display.update()
@@ -198,7 +206,7 @@ def shuffle():
     for i in range(0, SHUFFLE_MOVES):
         previous_move = ""
         if i > 0:
-            previous_move = moves[i-1]
+            previous_move = moves[i - 1]
         choices = []
         if blank_row != TOP and previous_move != UP:
             choices.append(DOWN)
@@ -225,6 +233,21 @@ def shuffle():
             pygame.quit()
             sys.exit()
         move(direction)
+
+
+def undo():
+    if len(MOVES) > 0:
+        previous_move = MOVES.pop()
+        if previous_move == UP:
+            move(DOWN)
+        elif previous_move == DOWN:
+            move(UP)
+        elif previous_move == LEFT:
+            move(RIGHT)
+        elif previous_move == RIGHT:
+            move(LEFT)
+
+        del MOVES[len(MOVES) - 1]  # Delete the move we just added
 
 
 main()
