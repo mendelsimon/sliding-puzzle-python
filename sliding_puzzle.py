@@ -7,14 +7,14 @@ FPS = 15
 BOARD_HEIGHT = 4
 BOARD_WIDTH = 4
 BOARD = [[cell + (row * BOARD_WIDTH) for cell in range(1, BOARD_WIDTH + 1)] for row in range(BOARD_HEIGHT)]
-BOARD[BOARD_WIDTH - 1][BOARD_HEIGHT - 1] = 0
+BOARD[BOARD_HEIGHT - 1][BOARD_WIDTH - 1] = 0
 
 BOX_SIZE = 100
 GAP_SIZE = 5
 MARGIN_SIZE = 20
 INFO_SIZE = 0
 WINDOW_WIDTH = (BOX_SIZE * BOARD_WIDTH) + ((GAP_SIZE * BOARD_WIDTH) - GAP_SIZE) + (MARGIN_SIZE * 2)
-WINDOW_HEIGHT = WINDOW_WIDTH + INFO_SIZE
+WINDOW_HEIGHT = (BOX_SIZE * BOARD_HEIGHT) + ((GAP_SIZE * BOARD_HEIGHT) - GAP_SIZE) + (MARGIN_SIZE * 2) + INFO_SIZE
 
 SHUFFLE_MOVES = 50
 FONT_SIZE = 32
@@ -40,9 +40,10 @@ DOWN = 'down'
 
 
 def main():
-    global DISPLAY_SURFACE, FPSCLOCK
+    global DISPLAY_SURFACE, FPSCLOCK, FONT
     pygame.init()
 
+    FONT = pygame.font.Font("freesansbold.ttf", FONT_SIZE)
     FPSCLOCK = pygame.time.Clock()
     DISPLAY_SURFACE = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("Sliding Puzzle")
@@ -101,8 +102,7 @@ def get_box_position(box):
 
 def draw_box(rect, num):
     """Draws the rect, with the num in middle"""
-    font = pygame.font.Font("freesansbold.ttf", FONT_SIZE)
-    label = font.render(str(num), True, FONT_COLOR)
+    label = FONT.render(str(num), True, FONT_COLOR)
     label_rect = label.get_rect()
     box = pygame.Rect(rect)
     label_rect.center = box.center
