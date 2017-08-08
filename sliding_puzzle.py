@@ -3,7 +3,7 @@ import sys
 import random
 from pygame.locals import *
 
-FPS = 15
+FPS = 30
 BOARD_HEIGHT = 4
 BOARD_WIDTH = 4
 BOARD = [[cell + (row * BOARD_WIDTH) for cell in range(1, BOARD_WIDTH + 1)] for row in range(BOARD_HEIGHT)]
@@ -18,7 +18,7 @@ WINDOW_HEIGHT = (BOX_SIZE * BOARD_HEIGHT) + ((GAP_SIZE * BOARD_HEIGHT) - GAP_SIZ
 
 SHUFFLE_MOVES = 50
 FONT_SIZE = 32
-ANIMATE_SPEED = 20
+ANIMATE_SPEED = 25
 
 ROW_INDEX = 0
 CELL_INDEX = 1
@@ -170,11 +170,13 @@ def animate(start_box, end_box, num):
             draw_board()
             draw_box((new_x, y, BOX_SIZE, BOX_SIZE), num)
             pygame.display.update()
+            FPSCLOCK.tick(FPS)
     elif delta_y != 0:
         for new_y in range(y, end_y, y_step):
             draw_board()
             draw_box((x, new_y, BOX_SIZE, BOX_SIZE), num)
             pygame.display.update()
+            FPSCLOCK.tick(FPS)
     else:
         raise Exception("Nothing to animate")
 
