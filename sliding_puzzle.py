@@ -6,9 +6,6 @@ from pygame.locals import *
 FPS = 60
 BOARD_HEIGHT = 4
 BOARD_WIDTH = 4
-BOARD = [[cell + (row * BOARD_WIDTH) for cell in range(1, BOARD_WIDTH + 1)] for row in range(BOARD_HEIGHT)]
-BOARD[BOARD_HEIGHT - 1][BOARD_WIDTH - 1] = 0
-ORIGINAL_BOARD = [row[:] for row in BOARD]
 
 BOX_SIZE = 100
 GAP_SIZE = 5
@@ -40,6 +37,7 @@ UP = 'up'
 DOWN = 'down'
 
 MOVES = []
+SHOW_WIN = False
 
 
 def main():
@@ -57,6 +55,11 @@ def main():
 
 
 def play_game():
+    global BOARD, ORIGINAL_BOARD
+    BOARD = [[cell + (row * BOARD_WIDTH) for cell in range(1, BOARD_WIDTH + 1)] for row in range(BOARD_HEIGHT)]
+    BOARD[BOARD_HEIGHT - 1][BOARD_WIDTH - 1] = 0
+    ORIGINAL_BOARD = [row[:] for row in BOARD]
+
     draw_board()
     pygame.display.update()
 
@@ -83,8 +86,22 @@ def play_game():
                     undo()
                 elif event.key == K_r:
                     reset()
+                elif event.key == K_RETURN:
+                    game_start()
+
+        if SHOW_WIN and BOARD == ORIGINAL_BOARD:
+            print("win")
+            return  # Display the win screen on win
 
         FPSCLOCK.tick(FPS)
+
+
+def game_start():
+    global SHOW_WIN
+    if not SHOW_WIN:
+        shuffle()
+        SHOW_WIN = True
+
 
 
 def draw_board():
@@ -194,7 +211,32 @@ def animate(start_box, end_box, num):
 
 def play_win_screen():
     """Displays a message informing the player that they won"""
-    # TODO implement win screen
+    global SHOW_WIN
+    SHOW_WIN = False
+    DISPLAY_SURFACE.fill(BG_COLOR)
+    you_win_font = pygame.font.Font("freesansbold.ttf", 60)
+    press_key_font = pygame.font.Font("freesansbold.ttf", 30)
+    you_win_label = you_win_font.render("You Win!", True, FONT_COLOR)
+    press_key_label = press_key_font.render("Press any key to reset", True, FONT_COLOR)
+    you_win_rect = you_win_label.get_rect()
+    press_key_rect = press_key_label.get_rect()
+    you_win_rect.midbottom = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+    press_key_rect.midtop = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+    DISPLAY_SURFACE.blit(you_win_label, you_win_rect)
+    DISPLAY_SURFACE.blit(press_key_label, press_key_rect)
+    pygame.display.update()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                else:
+                    return
 
 
 def shuffle():
