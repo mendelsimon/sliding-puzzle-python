@@ -103,7 +103,6 @@ def game_start():
         SHOW_WIN = True
 
 
-
 def draw_board():
     """Draws the game board"""
     DISPLAY_SURFACE.fill(BG_COLOR)
@@ -241,6 +240,7 @@ def play_win_screen():
 
 def shuffle():
     """Shuffles the board intelligently. Does not make invalid moves, or undo last move"""
+    global ANIMATE_SPEED
     TOP = 0
     BOTTOM = BOARD_HEIGHT - 1
     LEFTMOST = 0
@@ -273,11 +273,15 @@ def shuffle():
         elif moves[i] == RIGHT:
             blank_cell -= 1
 
+    normal_animate_speed = ANIMATE_SPEED
+    ANIMATE_SPEED = SHUFFLE_MOVES // 4
+    i = 1
     for direction in moves:
         if len(pygame.event.get(QUIT)) > 0 or pygame.key.get_pressed()[K_ESCAPE]:
             pygame.quit()
             sys.exit()
         move(direction)
+    ANIMATE_SPEED = normal_animate_speed
 
 
 def undo():
