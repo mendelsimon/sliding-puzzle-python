@@ -3,7 +3,7 @@ import sys
 import random
 from pygame.locals import *
 
-FPS = 30
+FPS = 60
 BOARD_HEIGHT = 4
 BOARD_WIDTH = 4
 BOARD = [[cell + (row * BOARD_WIDTH) for cell in range(1, BOARD_WIDTH + 1)] for row in range(BOARD_HEIGHT)]
@@ -18,7 +18,7 @@ WINDOW_HEIGHT = (BOX_SIZE * BOARD_HEIGHT) + ((GAP_SIZE * BOARD_HEIGHT) - GAP_SIZ
 
 SHUFFLE_MOVES = 50
 FONT_SIZE = 32
-ANIMATE_SPEED = 25
+ANIMATE_SPEED = 20
 
 ROW_INDEX = 0
 CELL_INDEX = 1
